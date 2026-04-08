@@ -322,6 +322,139 @@ input[type=file] { display: none; }
 <script>
 const TKK_COLORS = [{"hex": "#00B800", "label": "Groen"}, {"hex": "#3391FF", "label": "Blauw"}, {"hex": "#FC470F", "label": "Oranje"}, {"hex": "#FF00DB", "label": "Roze"}, {"hex": "#000000", "label": "Zwart"}, {"hex": "#FFFFFF", "label": "Wit"}];
 
+function previewSize() {
+  return document.getElementById('canvas-wrapper').offsetWidth;
+}
+
+const photo = {
+  src: null, naturalW: 0, naturalH: 0,
+  x: 0, y: 0, scale: 100,
+  dragging: false, dragOffX: 0, dragOffY: 0
+};
+const krib = {
+  content: null, x: 60, y: 60, scale: 60, rotate: 0, color: '#000000',
+  dragging: false, dragOffX: 0, dragOffY: 0
+};
+
+function switchTab(tab) {
+  document.getElementById('tab-kribbel').classList.toggle('active', tab === 'kribbel');
+  document.getElementById('tab-krabbel').classList.toggle('active', tab === 'krabbel');
+  document.getElementById('panel-kribbel').style.display = tab === 'kribbel' ? 'block' : 'none';
+  document.getElementById('panel-krabbel').style.display = tab === 'krabbel' ? 'block' : 'none';
+}
+
+function loadPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const src = e.target.result;
+    const probe = new Image();
+    probe.onload = () => {
+      const P = previewSize();
+      photo.src = src;
+      photo.naturalW = probe.naturalWidth;
+      photo.naturalH = probe.naturalHeight;
+      const fit = P / Math.min(probe.naturalWidth, probe.naturalHeight);
+      photo.scale = fit * 100;
+      photo.x = (P - probe.naturalWidth  * fit) / 2;
+      photo.y = (P - probe.naturalHeight * fit) / 2;
+      document.getElementById('photo-scale').value = Math.round(photo.scale);
+      document.getElementById('val-photo-scale').textContent = Math.round(photo.scale) + '%';
+      renderPhoto();
+      addPhotoThumb(src);
+      document.getElementById('photo-controls').style.display = 'block';
+      document.getElementById('empty-hint').style.display = 'none';
+    };
+    probe.src = src;
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderPhoto() {
+  const layer = document.getElementById('photo-layer');
+  const img   = document.getElementById('photo-img');
+  if (!photo.src) return;
+  const w = photo.naturalW * (photo.scale / 100);
+  const h = photo.naturalH * (photo.scale / 100);
+  img.src = photo.src;
+  img.style.filter = 'grayscale(100%)';
+  img.style.width = w + 'px'; img.style.height = h + 'px';
+  layer.style.width = w + 'px'; layer.style.height = h + 'px';
+  layer.style.left = photo.x + 'px'; layer.style.top = photo.y + 'px';
+  layer.style.display = 'block';
+}
+
+function updatePhotoControls() {
+  photo.scale = parseInt(document.getElementById('photo-scale').value);
+  document.getElementById('val-photo-scale').textContent = photo.scale + '%';
+  renderPhoto();
+}
+
+function addPhotoThumb(src) {
+  const grid = document.getElementById('photo-thumbs');
+  document.querySelectorAll('#photo-thumbs .thumb').forEach(t => t.classList.remove('active'));
+  const wrap = document.createElement('div');
+  wrap.className = 'thumb-wrap';
+  const thumb = document.createElement('div');
+  thumb.className = 'thumb active'; thumb.style.padding = '0';
+  const img = document.createElement('img'); img.src = src;
+  thumb.appendChild(img);
+  thumb.onclick = () => {
+    document.querySelectorAll('#photo-thumbs .thumb').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+    const probe = new Image();
+    probe.onload = () => {
+      const P = previewSize();
+      photo.src = src; photo.naturalW = probe.naturalWidth; photo.naturalH = probe.naturalHeight;
+      const fit = P / Math.min(probe.naturalWidth, probe.naturalHeight);
+      photo.scale = fit * 100;
+      photo.x = (P - probe.naturalWidth * fit) / 2;
+      photo.y = (P - probe.naturalHeight * fit) / 2;
+      document.getElementById('photo-scale').value = Math.round(photo.scale);
+      document.getElementById('val-photo-scale').textContent = Math.round(photo.scale) + '%';
+      renderPhoto();
+    };
+    probe.src = src;
+  };
+  wrap.appendChild(thumb);
+  grid.appendChild(wrap);
+}
+
+(function() {
+  const layer = document.getElementById('photo-layer');
+  layer.addEventListener('pointerdown', e => {
+    if (!photo.src || krib.dragging) return;
+    photo.dragging = true;
+    photo.dragOffX = e.clientX - photo.x;
+    photo.dragOffY = e.clientY - photo.y;
+    layer.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  layer.addEventListener('pointermove', e => {
+    if (!photo.dragging) return;
+    photo.x = e.clientX - photo.dragOffX;
+    photo.y = e.clientY - photo.dragOffY;
+    renderPhoto();
+  });
+  layer.addEventListener('pointerup', () => { photo.dragging = false; });
+})();
+
+function initColors() {
+  const palette = document.getElementById('color-palette');
+  TKK_COLORS.forEach((c, i) => {
+    const sw = document.createElement('div');
+    sw.className = 'color-swatch' + (c.hex === '#FFFFFF' ? ' swatch-white' : '') + (i === 4 ? ' active' : '');
+    sw.style.background = c.hex; sw.title = c.label;
+    sw.onclick = () => {
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+      sw.classList.add('active');
+      krib.color = c.hex;
+      document.getElementById('svg-overlay').style.color = krib.color;
+    };
+    palette.appendChild(sw);
+  });
+}
+
 async function initThumbs() {
   const manifest = await fetch('manifest.json').then(r => r.json());
   const loadSvgs = async (items, gridId) => {
