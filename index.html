@@ -574,7 +574,14 @@ function loadSVG(input, tab) {
   reader.readAsText(file);
 }
 
+function normalizeSvg(svg) {
+  return svg.replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/gi, (_, open, body, close) =>
+    open + body.replace(/fill\s*:\s*#[0-9a-fA-F]{3,6}/gi, 'fill: currentColor') + close
+  );
+}
+
 function addSvgThumbToGrid(svgContent, label, gridId, activate) {
+  svgContent = normalizeSvg(svgContent);
   if (activate) {
     document.querySelectorAll('#kribbel-thumbs .thumb, #krabbel-thumbs .thumb').forEach(t => t.classList.remove('active'));
   }
