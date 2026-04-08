@@ -1,0 +1,142 @@
+{
+  "kribbels": [
+    {
+      "label": "Bloem\ndikke lijn",
+      "file": "kribbels/bloem-dikke-lijn.svg"
+    },
+    {
+      "label": "Bloem\ndunne lijn",
+      "file": "kribbels/bloem-dunne-lijn.svg"
+    },
+    {
+      "label": "Hart",
+      "file": "kribbels/hart.svg"
+    },
+    {
+      "label": "Helikopter",
+      "file": "kribbels/helikopter.svg"
+    },
+    {
+      "label": "Kribbel",
+      "file": "kribbels/kribbel.svg"
+    },
+    {
+      "label": "Ogen",
+      "file": "kribbels/ogen.svg"
+    },
+    {
+      "label": "Oog",
+      "file": "kribbels/oog.svg"
+    },
+    {
+      "label": "Pijlen",
+      "file": "kribbels/pijlen.svg"
+    },
+    {
+      "label": "Regenboog",
+      "file": "kribbels/regenboog.svg"
+    },
+    {
+      "label": "Regenwolk",
+      "file": "kribbels/regenwolk.svg"
+    },
+    {
+      "label": "Schapen",
+      "file": "kribbels/schapen.svg"
+    },
+    {
+      "label": "Spiraal",
+      "file": "kribbels/spiraal.svg"
+    },
+    {
+      "label": "Sterren",
+      "file": "kribbels/sterren.svg"
+    },
+    {
+      "label": "Vis",
+      "file": "kribbels/vis.svg"
+    },
+    {
+      "label": "Vlam",
+      "file": "kribbels/vlam.svg"
+    },
+    {
+      "label": "Vleugel",
+      "file": "kribbels/vleugel.svg"
+    },
+    {
+      "label": "Vrienden",
+      "file": "kribbels/vrienden.svg"
+    },
+    {
+      "label": "Wereldbol",
+      "file": "kribbels/wereldbol.svg"
+    },
+    {
+      "label": "Wolk",
+      "file": "kribbels/wolk.svg"
+    },
+    {
+      "label": "Zeepaardje",
+      "file": "kribbels/zeepaardje.svg"
+    },
+    {
+      "label": "Zonnetje",
+      "file": "kribbels/zonnetje.svg"
+    }
+  ],
+  "krabbels": [
+    {
+      "label": "Durven\nis goud",
+      "file": "krabbels/durven-is-goud.svg"
+    },
+    {
+      "label": "Alles valt\nte herstellen",
+      "file": "krabbels/alles-valt-te-herstellen.svg"
+    },
+    {
+      "label": "Bloei boven\ngroei",
+      "file": "krabbels/bloei-boven-groei.svg"
+    },
+    {
+      "label": "Daaag",
+      "file": "krabbels/daaag.svg"
+    },
+    {
+      "label": "Dag",
+      "file": "krabbels/dag.svg"
+    },
+    {
+      "label": "Hallo",
+      "file": "krabbels/hallo.svg"
+    },
+    {
+      "label": "Logic",
+      "file": "krabbels/logic.svg"
+    },
+    {
+      "label": "Magic",
+      "file": "krabbels/magic.svg"
+    },
+    {
+      "label": "Relatie voor\ntaak",
+      "file": "krabbels/relatie-voor-taak.svg"
+    },
+    {
+      "label": "Taal\ntransformeert",
+      "file": "krabbels/taal-transformeert.svg"
+    },
+    {
+      "label": "Thanks bye",
+      "file": "krabbels/thanks-bye.svg"
+    },
+    {
+      "label": "The Kind\nKids",
+      "file": "krabbels/the-kind-kids.svg"
+    },
+    {
+      "label": "Wie",
+      "file": "krabbels/wie.svg"
+    }
+  ]
+}
