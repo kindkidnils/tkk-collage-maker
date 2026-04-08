@@ -134,6 +134,10 @@ html, body {
 .divider { border: none; border-top: 0.5px solid #E5E7E4; margin: 0; }
 input[type=file] { display: none; }
 
+#sheet-handle { display: none; }
+#mobile-export { display: none; }
+
+
 .toggle-bar {
   display: flex; background: #ECEEED; border-radius: 99px; padding: 3px; gap: 2px; margin-bottom: 10px;
   width: 100%;
@@ -234,12 +238,87 @@ input[type=file] { display: none; }
   opacity: 0.35;
   padding: 0 4px 4px 0;
 }
+
+@media (max-width: 768px) {
+  #sidebar {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    height: 65vh;
+    transform: translateY(calc(100% - 56px));
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  #sidebar.open { transform: translateY(0); }
+
+  #sheet-handle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    height: 56px;
+    gap: 5px;
+    cursor: pointer;
+    border-bottom: 0.5px solid #E5E7E4;
+    user-select: none;
+  }
+  #handle-bar {
+    width: 36px; height: 4px;
+    background: #D8DAD7; border-radius: 99px;
+  }
+  #handle-label {
+    font-size: 10px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: #111; font-family: 'Bricolage Grotesque', sans-serif;
+  }
+
+  #main {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 56px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  #canvas-area {
+    flex: none;
+    width: auto;
+    gap: 0;
+  }
+  #export-bar { display: none; }
+  #copyright  { display: none; }
+
+  #canvas-wrapper {
+    width:  min(calc(100vw - 24px), calc(100vh - 80px));
+    height: min(calc(100vw - 24px), calc(100vh - 80px));
+  }
+  #app.sheet-open #canvas-wrapper {
+    width:  min(calc(100vw - 24px), calc(34vh));
+    height: min(calc(100vw - 24px), calc(34vh));
+  }
+
+  #mobile-export {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 4px;
+  }
+  #mobile-export .btn { width: 100%; text-align: center; }
+}
 </style>
 </head>
 <body>
 <div id="app">
 
   <div id="sidebar">
+    <div id="sheet-handle">
+      <div id="handle-bar"></div>
+      <span id="handle-label">The Kind Collage Maker</span>
+    </div>
     <div id="sidebar-header">
       <div class="app-label">The Kind Collage Maker</div>
     </div>
@@ -297,6 +376,11 @@ input[type=file] { display: none; }
           <span class="val" id="val-rotate">0°</span>
         </div>
         <div style="margin-top:2px" class="hint-text">Sleep foto of illustratie om te positioneren.</div>
+      </div>
+
+      <div id="mobile-export">
+        <button class="btn" onclick="exportCanvas(1080, this)">Export digitaal (72 dpi)</button>
+        <button class="btn" onclick="exportCanvas(3240, this)">Export print (300 dpi)</button>
       </div>
 
     </div>
@@ -649,6 +733,36 @@ async function exportCanvas(exportPx, btn) {
 }
 
 window.addEventListener('resize', () => { renderPhoto(); renderSvg(); });
+
+(function() {
+  const sidebar = document.getElementById('sidebar');
+  const handle  = document.getElementById('sheet-handle');
+  const app     = document.getElementById('app');
+
+  function setOpen(open) {
+    sidebar.classList.toggle('open', open);
+    app.classList.toggle('sheet-open', open);
+    setTimeout(() => { renderPhoto(); renderSvg(); }, 360);
+  }
+
+  let startY = 0, startTime = 0;
+
+  handle.addEventListener('pointerdown', e => {
+    startY    = e.clientY;
+    startTime = Date.now();
+    handle.setPointerCapture(e.pointerId);
+  });
+
+  handle.addEventListener('pointerup', e => {
+    const dy       = e.clientY - startY;
+    const velocity = dy / Math.max(Date.now() - startTime, 1);
+    const isOpen   = sidebar.classList.contains('open');
+    if (Math.abs(dy) < 8)        setOpen(!isOpen);
+    else if (velocity < -0.3 || dy < -40) setOpen(true);
+    else if (velocity >  0.3 || dy >  40) setOpen(false);
+    else setOpen(isOpen);
+  });
+})();
 
 initColors();
 initThumbs();
