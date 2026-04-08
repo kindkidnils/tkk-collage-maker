@@ -380,6 +380,7 @@ function renderPhoto() {
   const w = photo.naturalW * (photo.scale / 100);
   const h = photo.naturalH * (photo.scale / 100);
   img.src = photo.src;
+  img.style.filter = 'grayscale(100%)';
   img.style.width = w + 'px'; img.style.height = h + 'px';
   layer.style.width = w + 'px'; layer.style.height = h + 'px';
   layer.style.left = photo.x + 'px'; layer.style.top = photo.y + 'px';
@@ -590,7 +591,9 @@ async function exportCanvas(exportPx) {
       img.onload = () => {
         const w = photo.naturalW * (photo.scale / 100) * ratio;
         const h = photo.naturalH * (photo.scale / 100) * ratio;
+        ctx.filter = 'grayscale(1)';
         ctx.drawImage(img, photo.x * ratio, photo.y * ratio, w, h);
+        ctx.filter = 'none';
         resolve();
       };
       img.src = photo.src;
