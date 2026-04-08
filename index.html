@@ -305,8 +305,8 @@ input[type=file] { display: none; }
   <div id="main">
     <div id="canvas-area">
       <div id="export-bar">
-        <button class="btn" onclick="exportCanvas(1080)">Export digitaal (72 dpi)</button>
-        <button class="btn" onclick="exportCanvas(3240)">Export print (300 dpi)</button>
+        <button class="btn" onclick="exportCanvas(1080, this)">Export digitaal (72 dpi)</button>
+        <button class="btn" onclick="exportCanvas(3240, this)">Export print (300 dpi)</button>
       </div>
       <div id="canvas-wrapper">
         <div class="empty-hint" id="empty-hint">Upload een foto om te beginnen</div>
@@ -434,7 +434,8 @@ function addPhotoThumb(src) {
     if (!photo.dragging) return;
     photo.x = e.clientX - photo.dragOffX;
     photo.y = e.clientY - photo.dragOffY;
-    renderPhoto();
+    layer.style.left = photo.x + 'px';
+    layer.style.top  = photo.y + 'px';
   });
   layer.addEventListener('pointerup', () => { photo.dragging = false; });
 })();
@@ -456,17 +457,25 @@ function initColors() {
 }
 
 async function initThumbs() {
-  const manifest = await fetch('manifest.json').then(r => r.json());
-  const loadSvgs = async (items, gridId) => {
-    await Promise.all(items.map(async item => {
-      const svg = await fetch(item.file).then(r => r.text());
-      addSvgThumbToGrid(svg, item.label, gridId, false);
-    }));
-  };
-  await Promise.all([
-    loadSvgs(manifest.kribbels, 'kribbel-thumbs'),
-    loadSvgs(manifest.krabbels, 'krabbel-thumbs')
-  ]);
+  try {
+    const manifest = await fetch('manifest.json').then(r => r.json());
+    const loadSvgs = async (items, gridId) => {
+      for (const item of items) {
+        try {
+          const svg = await fetch(item.file).then(r => r.text());
+          addSvgThumbToGrid(svg, item.label, gridId, false);
+        } catch {
+          console.warn(`Kon ${item.file} niet laden`);
+        }
+      }
+    };
+    await Promise.all([
+      loadSvgs(manifest.kribbels, 'kribbel-thumbs'),
+      loadSvgs(manifest.krabbels, 'krabbel-thumbs')
+    ]);
+  } catch {
+    console.error('Kon manifest.json niet laden');
+  }
 }
 
 function loadSVG(input, tab) {
@@ -533,12 +542,12 @@ function renderSvg() {
   const svgEl = overlay.querySelector('svg');
   if (svgEl) { svgEl.style.width = w + 'px'; svgEl.style.height = h + 'px'; svgEl.style.display = 'block'; }
   overlay.style.color = krib.color;
-  applyOverlayTransform();
+  applyOverlayTransform(vb);
 }
 
-function applyOverlayTransform() {
+function applyOverlayTransform(vb) {
+  vb = vb || getSvgViewbox();
   const overlay = document.getElementById('svg-overlay');
-  const vb = getSvgViewbox();
   const P = previewSize();
   const w = (krib.scale / 100) * P;
   const h = w * (vb.h / vb.w);
@@ -585,7 +594,10 @@ function updateSvgControls() {
   overlay.addEventListener('pointerup', () => { krib.dragging = false; });
 })();
 
-async function exportCanvas(exportPx) {
+async function exportCanvas(exportPx, btn) {
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Bezig…';
   const P = previewSize();
   const ratio = exportPx / P;
   const canvas = document.createElement('canvas');
@@ -632,7 +644,11 @@ async function exportCanvas(exportPx) {
   link.download = exportPx === 1080 ? 'tkk-collage-1080.png' : 'tkk-collage-print-3240.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
+  btn.textContent = orig;
+  btn.disabled = false;
 }
+
+window.addEventListener('resize', () => { renderPhoto(); renderSvg(); });
 
 initColors();
 initThumbs();
