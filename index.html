@@ -121,15 +121,16 @@ html, body {
 .control-row label { font-size: 11px; color: #111; min-width: 48px; font-family: 'Bricolage Grotesque', sans-serif; }
 .control-row input[type=range] { flex: 1; accent-color: #111; }
 .val { font-size: 11px; font-family: 'Bricolage Grotesque', sans-serif; color: #111; min-width: 34px; text-align: right; }
-.color-palette { display: flex; gap: 6px; flex-wrap: wrap; }
+.color-palette { display: flex; gap: 10px; flex-wrap: wrap; }
 .color-swatch {
   width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
-  border: 1.5px solid transparent; transition: transform 0.12s, border-color 0.12s;
+  border: none; transition: transform 0.12s, box-shadow 0.12s;
+  box-shadow: 0 0 0 1.5px transparent;
 }
 .color-swatch:hover { transform: scale(1.12); }
-.color-swatch.active { border-color: #111; transform: scale(1.12); }
-.swatch-white { border-color: #ddd !important; }
-.swatch-white.active { border-color: #111 !important; }
+.color-swatch.active { transform: scale(1.12); box-shadow: 0 0 0 1.5px #fff, 0 0 0 3px #111; }
+.swatch-white { box-shadow: 0 0 0 1.5px #ddd; }
+.swatch-white.active { box-shadow: 0 0 0 1.5px #fff, 0 0 0 3px #111; }
 .hint-text { font-size: 11px; color: #111; line-height: 1.5; font-family: 'Bricolage Grotesque', sans-serif; font-style: italic; opacity: 0.6; }
 .divider { border: none; border-top: 0.5px solid #E5E7E4; margin: 0; }
 input[type=file] { display: none; }
