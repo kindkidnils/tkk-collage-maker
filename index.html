@@ -101,7 +101,19 @@ html, body {
   flex-shrink: 0;
   width: 72px;
   scroll-snap-align: start;
+  position: relative;
 }
+.thumb-remove {
+  position: absolute;
+  top: -5px; right: -5px;
+  width: 17px; height: 17px;
+  background: #111; color: #fff;
+  border-radius: 50%; border: 1.5px solid #fff;
+  cursor: pointer; font-size: 11px; line-height: 1;
+  display: none; align-items: center; justify-content: center;
+  z-index: 3; padding: 0;
+}
+.thumb-wrap:hover .thumb-remove { display: flex; }
 .thumb {
   aspect-ratio: 1; border-radius: 8px; border: 0.5px solid #D8DAD7;
   cursor: pointer; overflow: hidden; display: flex; align-items: center;
@@ -476,11 +488,36 @@ function updatePhotoControls() {
   renderPhoto();
 }
 
+function clearPhoto() {
+  photo.src = null;
+  const img = document.getElementById('photo-img');
+  img.src = '';
+  document.getElementById('photo-layer').style.display = 'none';
+  document.getElementById('photo-controls').style.display = 'none';
+  document.getElementById('empty-hint').style.display = '';
+}
+
 function addPhotoThumb(src) {
   const grid = document.getElementById('photo-thumbs');
   document.querySelectorAll('#photo-thumbs .thumb').forEach(t => t.classList.remove('active'));
   const wrap = document.createElement('div');
   wrap.className = 'thumb-wrap';
+
+  const removeBtn = document.createElement('button');
+  removeBtn.className = 'thumb-remove';
+  removeBtn.innerHTML = '&times;';
+  removeBtn.onclick = e => {
+    e.stopPropagation();
+    const wasActive = wrap.querySelector('.thumb.active') !== null;
+    wrap.remove();
+    const remaining = grid.querySelectorAll('.thumb-wrap');
+    if (remaining.length === 0) {
+      clearPhoto();
+    } else if (wasActive) {
+      remaining[0].querySelector('.thumb').click();
+    }
+  };
+
   const thumb = document.createElement('div');
   thumb.className = 'thumb active'; thumb.style.padding = '0';
   const img = document.createElement('img'); img.src = src;
@@ -502,6 +539,7 @@ function addPhotoThumb(src) {
     };
     probe.src = src;
   };
+  wrap.appendChild(removeBtn);
   wrap.appendChild(thumb);
   grid.appendChild(wrap);
 }
