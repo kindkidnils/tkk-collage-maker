@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none';">
 <title>Collage Maker | The Kind Kids</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -505,7 +506,7 @@ function addPhotoThumb(src) {
 
   const removeBtn = document.createElement('button');
   removeBtn.className = 'thumb-remove';
-  removeBtn.innerHTML = '&times;';
+  removeBtn.textContent = '×';
   removeBtn.onclick = e => {
     e.stopPropagation();
     const wasActive = wrap.querySelector('.thumb.active') !== null;
@@ -606,11 +607,29 @@ function loadSVG(input, tab) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    const svgContent = e.target.result;
+    const svgContent = sanitizeSvg(e.target.result);
     const label = file.name.replace(/\.svg$/i, '');
     addSvgThumbToGrid(svgContent, label, tab === 'kribbel' ? 'kribbel-thumbs' : 'krabbel-thumbs', true);
   };
   reader.readAsText(file);
+}
+
+function sanitizeSvg(svgString) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svgString, 'image/svg+xml');
+  // Remove script and foreignObject elements
+  doc.querySelectorAll('script, foreignObject').forEach(el => el.remove());
+  // Remove dangerous attributes on all elements
+  doc.querySelectorAll('*').forEach(el => {
+    [...el.attributes].forEach(attr => {
+      if (attr.name.startsWith('on')) {
+        el.removeAttribute(attr.name);
+      } else if (['href', 'xlink:href', 'src', 'action'].includes(attr.name.toLowerCase())) {
+        if (/^\s*javascript:/i.test(attr.value)) el.removeAttribute(attr.name);
+      }
+    });
+  });
+  return new XMLSerializer().serializeToString(doc.documentElement);
 }
 
 function normalizeSvg(svg) {
