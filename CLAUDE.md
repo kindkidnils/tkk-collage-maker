@@ -1,5 +1,11 @@
 # TKK Collage Maker
 
+> **Sinds november 2026 wordt `index.html` gebouwd vanuit de repo `kindkidnils/tkk-merk`.** Pas de tool
+> daar aan (`toepassingen/tools/collage-maker/bron.html`) en bouw opnieuw met
+> `python3 toepassingen/tools/bouw_tool.py collage-maker <deze map>`. Kribbels, statements, kleuren en de
+> vormgeving komen uit het merksysteem. De mappen `kribbels/`, `krabbels/` en `manifest.json` hier worden
+> niet meer gebruikt en blijven alleen staan voor oude links.
+
 ## Doel
 Interne tool voor The Kind Kids om snel een vierkante, zwart-witte fotocollage te maken met een TKK-"kribbel" of "krabbel" (handgetekende illustratie/tekst) erbovenop in een merkkleur. Vervangt het handmatig samenstellen van zo'n visual in Figma/Photoshop voor eenvoudige social- of contentposts.
 
